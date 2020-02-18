@@ -5,27 +5,31 @@ import isEmpty from 'lodash.isempty';
 import GoogleMap from '../components/GoogleMap';
 
 // consts: [34.0522, -118.2437]
-import LOS_ANGELES_CENTER from '../const/la_center';
+import United_States from '../const/la_center';
 
 const getInfoWindowString = place => `
     <div>
       <div style="font-size: 16px;">
-        ${place.name}
+        ${place.username}
       </div>
       <div style="font-size: 14px;">
         <span style="color: grey;">
-        ${place.rating}
+        ${place.accountName}
         </span>
-        <span style="color: orange;">${String.fromCharCode(9733).repeat(Math.floor(place.rating))}</span><span style="color: lightgrey;">${String.fromCharCode(9733).repeat(5 - Math.floor(place.rating))}</span>
+        <span style="color: orange;">${String.fromCharCode(9733).repeat(
+          Math.floor(place.rating)
+        )}</span><span style="color: lightgrey;">${String.fromCharCode(
+  9733
+).repeat(5 - Math.floor(place.rating))}</span>
       </div>
       <div style="font-size: 14px; color: grey;">
-        ${place.types[0]}
+        
       </div>
       <div style="font-size: 14px; color: grey;">
         ${'$'.repeat(place.price_level)}
       </div>
       <div style="font-size: 14px; color: green;">
-        ${place.opening_hours.open_now ? 'Open' : 'Closed'}
+        
       </div>
     </div>`;
 
@@ -34,18 +38,22 @@ const handleApiLoaded = (map, maps, places) => {
   const markers = [];
   const infowindows = [];
 
-  places.forEach((place) => {
-    markers.push(new maps.Marker({
-      position: {
-        lat: place.geometry.location.lat,
-        lng: place.geometry.location.lng,
-      },
-      map,
-    }));
+  places.forEach(place => {
+    markers.push(
+      new maps.Marker({
+        position: {
+          lat: place.lat,
+          lng: place.lng
+        },
+        map
+      })
+    );
 
-    infowindows.push(new maps.InfoWindow({
-      content: getInfoWindowString(place),
-    }));
+    infowindows.push(
+      new maps.InfoWindow({
+        content: getInfoWindowString(place)
+      })
+    );
   });
 
   markers.forEach((marker, i) => {
@@ -60,15 +68,15 @@ class MarkerInfoWindowGmapsObj extends Component {
     super(props);
 
     this.state = {
-      places: [],
+      places: []
     };
   }
 
   componentDidMount() {
-    fetch('places.json')
+    fetch('http://localhost:3006/v2/userlogs/getLocations')
       .then(response => response.json())
-      .then((data) => {
-        data.results.forEach((result) => {
+      .then(data => {
+        data.results.forEach(result => {
           result.show = false; // eslint-disable-line no-param-reassign
         });
         this.setState({ places: data.results });
@@ -77,16 +85,18 @@ class MarkerInfoWindowGmapsObj extends Component {
 
   render() {
     const { places } = this.state;
-
+    console.log(places);
     return (
       <Fragment>
         {!isEmpty(places) && (
           <GoogleMap
-            defaultZoom={10}
-            defaultCenter={LOS_ANGELES_CENTER}
+            defaultZoom={4.9}
+            defaultCenter={United_States}
             bootstrapURLKeys={{ key: process.env.REACT_APP_MAP_KEY }}
             yesIWantToUseGoogleMapApiInternals
-            onGoogleApiLoaded={({ map, maps }) => handleApiLoaded(map, maps, places)}
+            onGoogleApiLoaded={({ map, maps }) =>
+              handleApiLoaded(map, maps, places)
+            }
           />
         )}
       </Fragment>
